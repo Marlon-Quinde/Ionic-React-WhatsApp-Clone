@@ -1,0 +1,42 @@
+:root {
+    --primary: #128C7E
+}
+
+.menu-bar {
+    --background: var(--primary);
+    --color: white;
+    border: none;
+}
+
+.tabButton{
+    --color-selected: white;
+}
+
+.tab-selected {
+    border-bottom: 3px solid #fff;
+}
+
+.login-bar{
+    --background: var(--primary);
+    --color: white;
+    border: none;
+}
+
+/* ? Login */
+.passcode-input{
+    --border-color: var(--primary);
+}
+
+.login-button{
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    width: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chat-screen{
+    --padding-end: 10px
+}
