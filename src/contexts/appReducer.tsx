@@ -5,7 +5,7 @@ export interface AppAction {
   payload: any;
 }
 
-type TypeAppAction = "setAppName" | "loadUser";
+type TypeAppAction = "setAppName" | "loadUser" | "setNoTabs" | "setChattingWith";
 
 export const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
@@ -23,6 +23,16 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         user,
 
       };
+    case "setNoTabs":
+      return {
+        ...state,
+        noTabs: action.payload
+      }
+    case "setChattingWith":
+      return {
+        ...state,
+        chattingWith: action.payload
+      }
     default:
       return state;
   }

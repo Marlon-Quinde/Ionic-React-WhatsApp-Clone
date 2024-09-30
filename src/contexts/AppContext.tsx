@@ -1,10 +1,12 @@
 import React, { createContext, useReducer } from "react";
 import { AppAction, appReducer } from "./appReducer";
-import { UserI } from "../interfaces/user.interface";
+import { ContactI, UserI } from "../interfaces/user.interface";
 
 export interface AppState {
     appName: string
     user: UserI
+    noTabs: boolean
+    chattingWith: ContactI | undefined
 }
 
 
@@ -17,7 +19,10 @@ export const AppContext = createContext<AppContextProps>({} as AppContextProps)
 
 const initialState: AppState = {
     appName: "WhatApp",
-    user: localStorage.getItem('whatsapp-clone-user') ? JSON.parse(localStorage.getItem('whatsapp-clone-user')!) : undefined
+    user: localStorage.getItem('whatsapp-clone-user') ? JSON.parse(localStorage.getItem('whatsapp-clone-user')!) : undefined,
+    noTabs: false,
+    chattingWith: undefined
+    
 }
 
 
