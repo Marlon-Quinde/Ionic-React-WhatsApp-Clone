@@ -16,12 +16,17 @@ import {
   useIonViewWillEnter,
   useIonViewWillLeave,
 } from "@ionic/react";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
 import { happyOutline, linkOutline, sendSharp } from "ionicons/icons";
+import { Utility } from "../utility/Utility";
+import { db } from "../config/firebaseConexion";
+import { MessageI } from "../interfaces/message.interface";
+import { addDoc, collection } from "firebase/firestore/lite";
 
 export const ChatPage = () => {
   const { state, dispatch } = useContext(AppContext);
+  const [message, setMessage] = useState<string | null>()
 
   useIonViewWillEnter(() => {
     if(!state.noTabs){
@@ -31,6 +36,29 @@ export const ChatPage = () => {
         })
     }
   })
+
+  const sendMessage = async () => {
+    try {
+      if(message){
+        const messageBody: MessageI = {
+          message_id: Utility.getRandom(),
+          sent_by: state.user.user_id,
+          channel: `${state.user.user_id},${state.chattingWith?.user_id}`,
+          type: 'text',
+          message,
+          file_url: null,
+          time: +Date.now()
+        }
+  
+        const send_response = await addDoc(collection(db, 'messages'), messageBody)
+  
+  
+        setMessage(null)
+      }
+    } catch (error) {
+      new Error('Ocurio un error al enviar el mensaje', error as any)
+    }
+  }
 
   useIonViewWillLeave(() => {
     dispatch({
@@ -66,7 +94,7 @@ export const ChatPage = () => {
                                     <IonIcon icon={happyOutline} size="large"></IonIcon>
                                 </IonCol>
                                 <IonCol size="8">
-                                    <IonInput placeholder="Type a message"></IonInput>
+                                    <IonInput value={message} onIonChange={(e) => setMessage(e.detail.value)} placeholder="Type a message"></IonInput>
                                 </IonCol>
                                 <IonCol size="2">
                                     <IonIcon className="media-icon" icon={linkOutline} size="large"></IonIcon>
@@ -75,7 +103,7 @@ export const ChatPage = () => {
                         </IonGrid>
                     </IonCol>  
                     <IonCol size="2">
-                        <IonButton className="chat-send-button">
+                        <IonButton onClick={sendMessage} className="chat-send-button">
                             <IonIcon icon={sendSharp}></IonIcon>
                         </IonButton>
                     </IonCol>
