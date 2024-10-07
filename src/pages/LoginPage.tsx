@@ -12,7 +12,7 @@ import {
 import React, { useState, useContext } from "react";
 import { AppContext } from "../contexts/AppContext";
 import { LoadingComponent } from "../components/Loading";
-import { getFirestore, collection, getDocs, getDoc, query, where } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDocs, getDoc, query, where } from 'firebase/firestore';
 import { db } from "../config/firebaseConexion";
 
 export const LoginPage = () => {
@@ -33,7 +33,6 @@ export const LoginPage = () => {
     querySnapshot.forEach((doc) => {
       user = doc.data()
       user.id = doc.id
-      console.log(user)
     });
 
     dispatch({type: 'loadUser', payload: user})

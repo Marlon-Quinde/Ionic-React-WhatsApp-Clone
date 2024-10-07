@@ -6,7 +6,7 @@ export interface AppState {
     appName: string
     user: UserI
     noTabs: boolean
-    chattingWith: ContactI | undefined
+    chattingWith: ContactI
 }
 
 
@@ -21,7 +21,7 @@ const initialState: AppState = {
     appName: "WhatApp",
     user: localStorage.getItem('whatsapp-clone-user') ? JSON.parse(localStorage.getItem('whatsapp-clone-user')!) : undefined,
     noTabs: false,
-    chattingWith: undefined
+    chattingWith: localStorage.getItem('current_contact') ? JSON.parse(localStorage.getItem('current_contact')!) : undefined
     
 }
 

@@ -8,14 +8,24 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  useIonViewWillLeave,
 } from "@ionic/react";
 import React, { useContext, useState } from "react";
 import { AppContext } from "../contexts/AppContext";
 import { ChatItem } from "../components/ChatItem";
 import { ContactI } from "../interfaces/user.interface";
+import { useHistory } from "react-router";
 
 export const Tab1 = () => {
   const { state, dispatch } = useContext(AppContext);
+  const history = useHistory()
+
+  useIonViewWillLeave(() => {
+    dispatch({
+        type: 'setNoTabs',
+        payload: true
+    })
+  })
 
   return (
     <IonPage>

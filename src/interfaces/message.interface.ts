@@ -5,7 +5,7 @@ export interface MessageI {
     type: MessageType;
     message: string;
     file_url: string | null;
-    time: number;
+    time: Date;
 }
 
 type MessageType = 'text' | ' media'

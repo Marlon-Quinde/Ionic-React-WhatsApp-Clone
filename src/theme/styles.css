@@ -1,5 +1,7 @@
 :root {
-    --primary: #128C7E
+    --primary: #128C7E;
+    --secondary: #dcf8c6;
+    --third: #ece5dd;
 }
 
 .menu-bar {
@@ -51,4 +53,38 @@
 
 .media-icon{
     transform: rotate(40deg);
+}
+
+.chat-page-content{
+    --background: var(--third);
+    --padding-end: 10px;
+    --padding-start: 10px
+}
+
+/* ? Chat Component */
+.chat-message-box-principal {
+    max-width: 70%;
+    border-radius: 5px;
+    background: white;
+    padding: 5px;
+    margin-top: 10px;
+    font-size: 1.2em;
+    color: black;
+    margin-bottom: 10px;
+}
+.chat-message-box-secondary {
+    max-width: 70%;
+    border-radius: 5px;
+    background: var(--secondary);
+    padding: 5px;
+    margin-top: 10px;
+    font-size: 1.2em;
+    color: black;
+    margin-left: auto;
+}
+
+.message-time {
+    text-align: right;
+    font-size: 0.7em;
+    color: #999;
 }

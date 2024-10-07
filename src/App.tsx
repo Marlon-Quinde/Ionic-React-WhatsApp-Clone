@@ -40,7 +40,7 @@ import { LoginPage } from "./pages/LoginPage";
 setupIonicReact();
 
 const App: React.FC = () => {
-  const { state, dispach } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
   return <IonApp>{state.user ? <TabsNavigation /> : <LoginPage />}</IonApp>;
 };
 
