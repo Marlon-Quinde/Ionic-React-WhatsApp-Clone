@@ -44,6 +44,8 @@ import {
 import { useHistory } from "react-router";
 import { db } from "../config/firebaseConexion";
 import { ChatMessages } from "../components/ChatMessages";
+import { Capacitor } from "@capacitor/core";
+import { Camera, CameraResultType } from '@capacitor/camera';
 
 export const ChatPage = () => {
   const { state, dispatch } = useContext(AppContext);
@@ -116,6 +118,19 @@ export const ChatPage = () => {
     }
   };
 
+  const getImage = async () => {
+    const isAvailable = Capacitor.isPluginAvailable("Camera");
+
+    if (!isAvailable) {
+      // Have the user upload a file instead
+    } else {
+      // Otherwise, make the call:
+      if (Capacitor.isNativePlatform()) {
+        // do something
+      }
+    }
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -148,7 +163,11 @@ export const ChatPage = () => {
                 <IonGrid>
                   <IonRow>
                     <IonCol size="2">
-                      <IonIcon icon={happyOutline} size="large"></IonIcon>
+                      <IonIcon
+                        icon={happyOutline}
+                        size="large"
+                        onClick={getImage}
+                      ></IonIcon>
                     </IonCol>
                     <IonCol size="8">
                       <IonInput

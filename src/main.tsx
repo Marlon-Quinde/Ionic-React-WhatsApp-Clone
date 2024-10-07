@@ -2,6 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { AppContextProvider } from './contexts/AppContext';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+
 
 const RootComponent = () => {
   return (
@@ -18,3 +20,5 @@ root.render(
     <RootComponent />
   </React.StrictMode>
 );
+
+defineCustomElements(window);
