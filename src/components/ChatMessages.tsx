@@ -1,4 +1,4 @@
-import { IonContent, IonPage } from '@ionic/react'
+import { IonContent, IonImg, IonPage } from '@ionic/react'
 import React, { useContext } from 'react'
 import { MessageI } from '../interfaces/message.interface'
 import { Utility } from '../utility/Utility'
@@ -11,16 +11,12 @@ interface Props {
 export const ChatMessages = ({ chat}:Props) => {
   const {state, dispatch} = useContext(AppContext)
 
-  if (state.user.user_id == chat.sent_by) {
-    return (
-      <div className="chat-message-box-secondary">
-        {chat.message}
-        <div className='message-time'>{Utility.getTime(chat.time)}</div>
-    </div>
-    )
-  }
+  const converted_image = chat.type === 'media' ? `data:image/jpeg;base64,${chat.file_url}` : ''
+
+
   return (
-    <div className="chat-message-box-principal ">
+    <div className={ state.user.user_id == chat.sent_by ? 'chat-message-box-secondary' : 'chat-message-box-principal'}>
+        {chat.type == 'media'&& <IonImg src={converted_image} />}
         {chat.message}
         <div className='message-time'>{Utility.getTime(chat.time)}</div>
     </div>

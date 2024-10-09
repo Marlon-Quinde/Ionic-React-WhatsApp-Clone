@@ -25,7 +25,7 @@ import {
   sendSharp,
 } from "ionicons/icons";
 import { Utility } from "../utility/Utility";
-import { MessageI } from "../interfaces/message.interface";
+import { MessageI, MessageType } from "../interfaces/message.interface";
 import {
   addDoc,
   collection,
@@ -44,13 +44,13 @@ import {
 import { useHistory } from "react-router";
 import { db } from "../config/firebaseConexion";
 import { ChatMessages } from "../components/ChatMessages";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, CapacitorException } from "@capacitor/core";
 import { Camera, CameraResultType } from '@capacitor/camera';
 
 export const ChatPage = () => {
   const { state, dispatch } = useContext(AppContext);
   const history = useHistory();
-  const [message, setMessage] = useState<string | null>();
+  const [message, setMessage] = useState<string>('');
   const [chatMessages, setChatMessages] = useState<MessageI[]>([]);
   let messageSubscription = useRef<Unsubscribe | null>(null);
 
@@ -92,26 +92,27 @@ export const ChatPage = () => {
         (doc) => doc.data() as MessageI
       );
       setChatMessages(messages);
-      console.log(messages);
+      
     });
   };
 
-  const sendMessage = async () => {
+  const sendMessage = async (type: MessageType = 'text', file_url: string = '') => {
     try {
-      if (message) {
+      if (message || type === 'media') {
         const messageBody: MessageI = {
           message_id: Utility.getRandom(),
           sent_by: state.user.user_id,
           channel: `${state.user.user_id},${state.chattingWith.user_id}`,
-          type: "text",
+          type,
           message,
-          file_url: null,
+          file_url,
           time: new Date(),
         };
+        console.log(messageBody)
 
         await addDoc(collection(db, "messages"), messageBody);
 
-        setMessage(null);
+        setMessage('');
       }
     } catch (error) {
       new Error("Ocurio un error al enviar el mensaje", error as any);
@@ -119,16 +120,28 @@ export const ChatPage = () => {
   };
 
   const getImage = async () => {
-    const isAvailable = Capacitor.isPluginAvailable("Camera");
-
-    if (!isAvailable) {
-      // Have the user upload a file instead
-    } else {
-      // Otherwise, make the call:
-      if (Capacitor.isNativePlatform()) {
-        // do something
+    try {
+      const isAvailable = Capacitor.isPluginAvailable("Camera");
+      if (!isAvailable) {
+        
+        // Have the user upload a file instead
+      } else {
+        // Otherwise, make the call:
+        if (Capacitor.isNativePlatform()) {
+          // do something
+        }
+        const image = await Camera.getPhoto({quality: 90, allowEditing: false, resultType: CameraResultType.Base64})
+        await sendMessage('media', image.base64String);
+      }
+    } catch (error) {
+      if (error instanceof CapacitorException && error.message === 'User cancelled photos app') {
+        console.log('El usuario ha cancelado la acción de seleccionar una foto');
+        
+      } else {
+        console.error('Error al seleccionar una foto:', error);
       }
     }
+    
   };
 
   return (
@@ -166,13 +179,12 @@ export const ChatPage = () => {
                       <IonIcon
                         icon={happyOutline}
                         size="large"
-                        onClick={getImage}
                       ></IonIcon>
                     </IonCol>
                     <IonCol size="8">
                       <IonInput
                         value={message}
-                        onIonChange={(e) => setMessage(e.detail.value)}
+                        onIonChange={(e) => setMessage(e.detail.value ?? '')}
                         placeholder="Type a message"
                       ></IonInput>
                     </IonCol>
@@ -181,6 +193,7 @@ export const ChatPage = () => {
                         className="media-icon"
                         icon={linkOutline}
                         size="large"
+                        onClick={getImage}
                       ></IonIcon>
                     </IonCol>
                   </IonRow>

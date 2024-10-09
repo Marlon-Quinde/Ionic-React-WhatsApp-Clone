@@ -3,9 +3,9 @@ export interface MessageI {
     sent_by: string;
     channel: string;
     type: MessageType;
-    message: string;
+    message: string | null;
     file_url: string | null;
     time: Date;
 }
 
-type MessageType = 'text' | ' media'
+export type MessageType = 'text' | 'media'
