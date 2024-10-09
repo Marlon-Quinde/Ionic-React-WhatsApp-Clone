@@ -9,6 +9,7 @@ import {
   IonIcon,
   IonInput,
   IonItem,
+  IonList,
   IonPage,
   IonRow,
   IonTitle,
@@ -45,14 +46,18 @@ import { useHistory } from "react-router";
 import { db } from "../config/firebaseConexion";
 import { ChatMessages } from "../components/ChatMessages";
 import { Capacitor, CapacitorException } from "@capacitor/core";
-import { Camera, CameraResultType } from '@capacitor/camera';
+import { Camera, CameraResultType } from "@capacitor/camera";
+import { LoadingComponent } from "../components/Loading";
 
 export const ChatPage = () => {
   const { state, dispatch } = useContext(AppContext);
   const history = useHistory();
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
   const [chatMessages, setChatMessages] = useState<MessageI[]>([]);
-  let messageSubscription = useRef<Unsubscribe | null>(null);
+  const [isloading, setIsloading] = useState<boolean>(true);
+  
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messageSubscription = useRef<Unsubscribe | null>(null);
 
   useIonViewWillEnter(() => {
     if (!state.noTabs) {
@@ -77,6 +82,18 @@ export const ChatPage = () => {
     }
   });
 
+  const scrollToBottom = () => {
+    if(messagesEndRef.current){
+      setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 1000);
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
+
   const messageChannel = async () => {
     const channel1 = `${state.user.user_id},${state.chattingWith.user_id}`;
     const channel2 = `${state.chattingWith.user_id},${state.user.user_id}`;
@@ -92,13 +109,16 @@ export const ChatPage = () => {
         (doc) => doc.data() as MessageI
       );
       setChatMessages(messages);
-      
+      setIsloading(false);
     });
   };
 
-  const sendMessage = async (type: MessageType = 'text', file_url: string = '') => {
+  const sendMessage = async (
+    type: MessageType = "text",
+    file_url: string = ""
+  ) => {
     try {
-      if (message || type === 'media') {
+      if (message || type === "media") {
         const messageBody: MessageI = {
           message_id: Utility.getRandom(),
           sent_by: state.user.user_id,
@@ -108,11 +128,11 @@ export const ChatPage = () => {
           file_url,
           time: new Date(),
         };
-        console.log(messageBody)
+        console.log(messageBody);
 
         await addDoc(collection(db, "messages"), messageBody);
 
-        setMessage('');
+        setMessage("");
       }
     } catch (error) {
       new Error("Ocurio un error al enviar el mensaje", error as any);
@@ -123,25 +143,31 @@ export const ChatPage = () => {
     try {
       const isAvailable = Capacitor.isPluginAvailable("Camera");
       if (!isAvailable) {
-        
         // Have the user upload a file instead
       } else {
         // Otherwise, make the call:
         if (Capacitor.isNativePlatform()) {
           // do something
         }
-        const image = await Camera.getPhoto({quality: 90, allowEditing: false, resultType: CameraResultType.Base64})
-        await sendMessage('media', image.base64String);
+        const image = await Camera.getPhoto({
+          quality: 90,
+          allowEditing: false,
+          resultType: CameraResultType.Base64,
+        });
+        await sendMessage("media", image.base64String);
       }
     } catch (error) {
-      if (error instanceof CapacitorException && error.message === 'User cancelled photos app') {
-        console.log('El usuario ha cancelado la acción de seleccionar una foto');
-        
+      if (
+        error instanceof CapacitorException &&
+        error.message === "User cancelled photos app"
+      ) {
+        console.log(
+          "El usuario ha cancelado la acción de seleccionar una foto"
+        );
       } else {
-        console.error('Error al seleccionar una foto:', error);
+        console.error("Error al seleccionar una foto:", error);
       }
     }
-    
   };
 
   return (
@@ -161,12 +187,23 @@ export const ChatPage = () => {
           </IonItem>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="chat-page-content">
-        {chatMessages.length
-          ? chatMessages.map((chat) => (
+      <IonContent className="chat-page-content" scrollEvents={true} style={{ overflowY: 'auto' }} >
+          {isloading ? (
+            <LoadingComponent
+              message="Cargando mensajes"
+              showLoading={isloading}
+            />
+          ) : chatMessages.length ? (
+            <>
+            {chatMessages.map((chat) => (
               <ChatMessages key={chat.message_id} chat={chat} />
-            ))
-          : "No messages"}
+            ))}
+            <div ref={messagesEndRef} />
+          </>
+            
+          ) : (
+            "No messages"
+          )}
       </IonContent>
       <IonFooter>
         <IonToolbar>
@@ -176,15 +213,12 @@ export const ChatPage = () => {
                 <IonGrid>
                   <IonRow>
                     <IonCol size="2">
-                      <IonIcon
-                        icon={happyOutline}
-                        size="large"
-                      ></IonIcon>
+                      <IonIcon icon={happyOutline} size="large"></IonIcon>
                     </IonCol>
                     <IonCol size="8">
                       <IonInput
                         value={message}
-                        onIonChange={(e) => setMessage(e.detail.value ?? '')}
+                        onIonChange={(e) => setMessage(e.detail.value ?? "")}
                         placeholder="Type a message"
                       ></IonInput>
                     </IonCol>

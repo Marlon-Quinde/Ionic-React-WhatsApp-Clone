@@ -16,7 +16,7 @@ import { ChatItem } from "../components/ChatItem";
 import { ContactI } from "../interfaces/user.interface";
 import { useHistory } from "react-router";
 
-export const Tab1 = () => {
+export const ChatListPage = () => {
   const { state, dispatch } = useContext(AppContext);
   const history = useHistory()
 

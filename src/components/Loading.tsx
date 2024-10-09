@@ -3,7 +3,7 @@ import React from 'react'
 
 interface Props {
     showLoading: boolean;
-    message: string
+    message?: string
 }
 
 export const LoadingComponent = ({showLoading, message}:Props) => {
@@ -11,6 +11,7 @@ export const LoadingComponent = ({showLoading, message}:Props) => {
     <IonLoading
           isOpen={showLoading}
           message={message}
+          mode='md'
         />
   )
 }
